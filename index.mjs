@@ -43,8 +43,8 @@ router.use(session({
   }));
 
 router.route('/').get((req, res) => { 
-    if (req.session.username) {
-        res.render('main', { layout: 'main', username: req.session.username });
+    if (req.session.email) {
+        res.render('main', { layout: 'main', username: req.session.email });
     }
     else {
         res.redirect('/login');
@@ -53,7 +53,7 @@ router.route('/').get((req, res) => {
 });
 
 router.route('/login').get((req, res) => { 
-    if (req.session.username) {
+    if (req.session.email) {
         res.redirect('/');
     }
     else {
@@ -79,6 +79,7 @@ router.route('/login').post(async (req, res) => {
     });
 });
 
+
 router.route('/logout').get((req, res) => { 
     req.session.destroy();
     res.redirect('/login');
@@ -86,6 +87,10 @@ router.route('/logout').get((req, res) => {
 
 router.route('/register').get((req, res) => { 
     res.render('register', { layout: 'main' });
+});
+
+router.route('/login/accountcreated').get((req, res) => {
+    res.render('login', { layout: 'main', message: 'Your account has been created. Please login.' });
 });
 
 router.route('/register').post(async (req, res) => { 
@@ -98,7 +103,9 @@ router.route('/register').post(async (req, res) => {
         // Signed in 
             const user = userCredential.user;
             // console.log(user)
-            res.send(user)
+            // res.send(user)
+            // res.render('login', { layout: 'main', message: 'Your account has been created. Please login.' });
+            res.redirect('/login/accountcreated');
         })
         .catch((error) => {
             const errorCode = error.code;

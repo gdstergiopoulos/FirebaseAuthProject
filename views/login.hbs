@@ -8,7 +8,12 @@
 </form> --}}
 
 <div class="loginpage">
-            <form method="post"> 
+            <form action="/login" method="post"> 
+                {{#if message}}
+                <div class="alert alert-success" role="alert">
+                    {{message}}
+                </div>
+                {{/if}}
                 <h1>Firebase Auth Demo</h1>
                 <br>
                 <label for="email" class="form-label">Email</label>

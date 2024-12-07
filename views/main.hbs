@@ -1,3 +1,23 @@
-<h1 style="color: white">Welcome</h1>
+{{!-- <h1 style="color: white">Welcome</h1>
 <h2 style="color: white">{{email}}</h2>
-<p style="color: white">You signed in using Firebase</p>
+<p style="color: white">You signed in using Firebase</p> --}}
+{{!-- <a href = "/logout" class="btn btn-primary">Logout</a> --}}
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #333;
+    }
+    .container {
+        text-align: center;
+    }
+</style>
+<div class="container">
+    <h1 style="color: white">Welcome</h1>
+    <h2 style="color: white">{{email}}</h2>
+    <p style="color: white">You signed in using Firebase</p>
+    <a href="/logout" class="btn btn-primary">Logout</a>
+</div>
