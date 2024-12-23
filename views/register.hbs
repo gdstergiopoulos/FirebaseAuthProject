@@ -1,25 +1,46 @@
 
 <div class="registerpage">
-        <form method="post">
-            <h1>Εγγραφή</h1>
+        <form action="/register" method="post">
+            <h1>Firebase Auth Demo</h1>
+            {{!-- <h2>Register</h2> --}}
             <br>
             {{!-- <label for="username" class="form-label">Όνομα Χρήστη</label> --}}
             {{!-- <input type="text" class="form-control" id="username" name="username" required> --}}
             <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" required>
-            <label for="password" class="form-label">Κωδικός</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-            <label for="confirmpassword" class="form-label">Επιβεβαίωση Κωδικού</label>
-            <input type="password" class="form-control" id="confirmpassword" name="confirmpassword" required>
+            <input type="email" class="form-control" id="email" name="email" placeholder="email">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+            <label for="confirmpassword" class="form-label">Confirm Password</label>
+            <input type="password" class="form-control" id="confirmpassword" name="confirmpassword" placeholder="Confirm Password" required>
             <br>
             {{#if error}}
             <div class="alert alert-danger" role="alert">
                 {{error}}
             </div>
             {{/if}}
-            <button type="submit" class="btn btn-primary">Δημιουργία</button>
+            <button type="submit" class="btn btn-primary">Sign up</button>
             <br>
-            <a id="linktoreg" href="/login">Έχω λογαριασμό</a>
+            <a id="linktoreg" href="/login">I have an account</a>
         </form>
+         <div class="divider">OR</div>
+            <div id="sign-in-options">
+                <a id="googleSignIn" class="google-btn">
+                    <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google Logo">
+                        <span>Sign-in with Google</span>
+                </a>
+                <a href="/login/anon" class="google-btn">
+                    <img src="https://img.icons8.com/metro/26/decision.png" alt="Google Logo">
+                        <span>Anonymous</span>
+                </a>
+                <br><br>
+                <a href="/login/passwordless" class="google-btn">
+                <img src="https://img.icons8.com/ios/50/mail.png" alt="Google Logo">
+                        <span>Passwordless</span>
+                </a>
+                <a href="/login/phone" class="google-btn">
+                <img src="https://img.icons8.com/ios/50/phone.png" alt="Google Logo">
+                        <span>Phone</span>
+                </a>
+            </div>
 </div>
 

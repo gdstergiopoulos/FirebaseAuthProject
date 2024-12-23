@@ -72,7 +72,7 @@ router.route('/').get((req, res) => {
     else{
         if(auth.currentUser){
         if(auth.currentUser.isAnonymous){
-            res.render('main', { layout: 'main', email: "Guest" });
+            res.render('main', { layout: 'main', email: "Guest", method: "Anonymous Login" });
         }
         else{
             res.render('main', { layout: 'main', email: auth.currentUser.email });
@@ -119,7 +119,7 @@ router.route('/login').post(async (req, res) => {
         let user = userCredential.user;
         // console.log(user)
         // req.session.email = req.body.email;
-        res.render('main', { layout: 'main', email:user.email });
+        res.render('main', { layout: 'main', email:user.email, method: "Email and Password" });
     })
     .catch((error) => {
         const errorCode = error.code;
