@@ -30,4 +30,75 @@
                 <br>
                 <a id="linktoreg" href="/register">Create an account</a>    
             </form>
+            <p style="color:aliceblue">OR</p>
+            <div>
+                <a id="googleSignIn" class="google-btn">
+                    <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google Logo">
+                        <span>Sign-in with Google</span>
+                </a>
+                <a href="/login/anon" class="google-btn">
+                    <img src="https://img.icons8.com/metro/26/decision.png" alt="Google Logo">
+                        <span>Anonymous</span>
+                </a>
+            </div>
+            
+        {{!-- <button id="googleSignIn">Sign in with Google</button> --}}
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDujX1xksZ12l4HTNIesiez-hdEPmRaO4g",
+            authDomain: "cybersecurityhmty.firebaseapp.com",
+            projectId: "cybersecurityhmty",
+            storageBucket: "cybersecurityhmty.firebaseapp.com",
+            messagingSenderId: "617838396186",
+            appId: "1:617838396186:web:bf8a87b857ca9d3748e2a3",
+            measurementId: "G-8B270P5BTQ"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const provider = new firebase.auth.GoogleAuthProvider();
+
+        // Google Sign-In button click handler
+        document.getElementById('googleSignIn').addEventListener('click', () => {
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    const user = result.user;
+                    //alert(`Welcome, ${user.displayName}!`);
+                    // Send user data to backend
+                user.getIdToken().then(idToken => {
+                    fetch('http://localhost:3000/login/google', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            uid: user.uid,
+                            displayName: user.displayName,
+                            email: user.email,
+                            photoURL: user.photoURL,
+                            idToken: idToken,
+                            
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    })
+                    .then(() => {
+                        window.location.href = '/';
+                    });
+                });
+                })
+                .catch((error) => {
+                    console.error(`Error during sign-in: ${error.message}`);
+                    alert(`Error: ${error.message}`);
+                });
+        });
+    </script>
+
 </div>

@@ -2,7 +2,9 @@ import express from 'express';
 import { engine } from 'express-handlebars';
 import session from 'express-session';
 import { initializeApp } from "firebase/app";
-import { getAuth,  createUserWithEmailAndPassword , signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import cors from 'cors';
+
+import { getAuth,  createUserWithEmailAndPassword , signInWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, signInWithRedirect,signInWithPopup, signInAnonymously, linkWithCredential} from "firebase/auth";
 // import {} from "firebase/auth";
 
 const firebaseConfig = {
@@ -15,8 +17,14 @@ const firebaseConfig = {
     measurementId: "G-8B270P5BTQ"
   };
 
+  
+
+
+
 const authapp= initializeApp(firebaseConfig);
 const auth= getAuth(authapp);
+
+const googleProvider = new GoogleAuthProvider();
 
 const app = express();
 const router = express.Router();
@@ -30,7 +38,7 @@ app.use(express.static('public'));
 app.use(router);
 
 router.use(express.urlencoded({ extended: true }));
-
+router.use(express.json());
 router.use(session({
 
     secret: process.env.SESSION_SECRET || "PynOjAuHetAuWawtinAytVunar", // κλειδί για κρυπτογράφηση του cookie
@@ -42,23 +50,65 @@ router.use(session({
     }
   }));
 
+router.use(cors());
 router.route('/').get((req, res) => { 
-    if (req.session.email) {
-        res.render('main', { layout: 'main', username: req.session.email });
+    // if (req.session.email) {
+    //     res.render('main', { layout: 'main', username: req.session.email });
+    // } else {
+    //     res.redirect('/login');
+    // }
+    // res.render('main', { layout: 'main' });
+    // onAuthStateChanged(auth, (user) => {
+    //     if (user) {
+    //         console.log("signed in",user.email)
+    //         res.render('main', { layout: 'main', email: user.email });
+    //     } else {
+    //         res.redirect('/login');
+    //     }
+    // });
+    if(req.session.email){ 
+        res.render('main', { layout: 'main', email: req.session.email, uid:req.session.uid, displayName:req.session.displayName, photoURL:req.session.photoURL });
     }
-    else {
+    else{
+        if(auth.currentUser){
+        if(auth.currentUser.isAnonymous){
+            res.render('main', { layout: 'main', email: "Guest" });
+        }
+        else{
+            res.render('main', { layout: 'main', email: auth.currentUser.email });
+        }
+    }
+    else{
         res.redirect('/login');
     }
-    // res.render('main', { layout: 'main' });
+    }
+    
 });
 
 router.route('/login').get((req, res) => { 
-    if (req.session.email) {
+    // if (req.session.email) {
+    //     res.redirect('/');
+    // }
+    // else {
+    //     res.render('login', { layout: 'main' });
+    // }
+    
+    // onAuthStateChanged(auth, (user) => {
+    //     if (user) {
+    //         // console.log("signed in",user)
+    //         res.redirect('/');
+    //     } else {
+    //         res.render('login');
+    //     }
+    // });
+
+    if(auth.currentUser){
         res.redirect('/');
     }
-    else {
+    else{
         res.render('login', { layout: 'main' });
     }
+
 });
 
 router.route('/login').post(async (req, res) => { 
@@ -68,8 +118,8 @@ router.route('/login').post(async (req, res) => {
         console.log("signed in")
         let user = userCredential.user;
         // console.log(user)
-        req.session.email = req.body.email;
-        res.render('main', { layout: 'main', email: req.session.email });
+        // req.session.email = req.body.email;
+        res.render('main', { layout: 'main', email:user.email });
     })
     .catch((error) => {
         const errorCode = error.code;
@@ -82,6 +132,11 @@ router.route('/login').post(async (req, res) => {
 
 router.route('/logout').get((req, res) => { 
     req.session.destroy();
+    auth.signOut().then(() => {
+        console.log('User signed out.');
+    }).catch((error) => {
+        console.error('Sign out error:', error);
+    });
     res.redirect('/login');
 });
 
@@ -115,6 +170,76 @@ router.route('/register').post(async (req, res) => {
     }
     
 });
+
+router.route('/login/anon').get(async (req, res) => {
+    if(auth.currentUser){
+        res.redirect('/');
+    }
+    else{
+        await signInAnonymously(auth)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            console.log(user)
+            // req.session.email = user;
+            res.redirect('/');
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            res.render('login', { layout: 'main', error: errorMessage });
+        });
+    }   
+}   );
+
+router.route('/login/google').post(async (req, res) => {
+    console.log(req.body);
+    if(req.body.uid){
+        console.log("entered")
+        req.session.email = req.body.email;
+        req.session.uid=req.body.uid;
+        req.session.displayName=req.body.displayName;
+        req.session.photoURL=req.body.photoURL;
+        res.json({ message: 'Google login successful' });
+    }   
+});
+
+// router.route('/login/google').get(async (req, res) => {
+//     try {
+//         await signInWithPopup(auth, googleProvider)
+//         .then((result) => {
+//             const credential = GoogleAuthProvider.credentialFromResult(result);
+//             const token = credential.accessToken; // Optional
+//             const user = result.user;
+//             res.render('main', { layout: 'main', email: user.email });
+//         })
+//         .catch((error) => {
+//             const errorMessage = error.message;
+//             res.render('login', { layout: 'main', error: errorMessage });
+//         });
+//     } catch (error) {
+//         const errorMessage = error.message;
+//         res.render('login', { layout: 'main', error: errorMessage });
+//     }
+// });
+
+// // Handle the result of the redirect
+// router.route('/google-redirect').get(async (req, res) => {
+//     try {
+//         const result = await getRedirectResult(auth);
+//         if (result) {
+//             const credential = GoogleAuthProvider.credentialFromResult(result);
+//             const token = credential.accessToken; // Optional: Use this token
+//             const user = result.user;
+
+//             res.render('main', { layout: 'main', email: user.email });
+//         } else {
+//             res.redirect('/login'); // No redirect result, go to login
+//         }
+//     } catch (error) {
+//         const errorMessage = error.message;
+//         res.render('login', { layout: 'main', error: errorMessage });
+//     }
+// });
 
 router.use((req, res) => {
     res.status(404).send('404 Not Found');

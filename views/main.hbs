@@ -16,8 +16,9 @@
     }
 </style>
 <div class="container">
-    <h1 style="color: white">Welcome</h1>
+    <h1 style="color: white">Welcome, {{displayName}}</h1>
     <h2 style="color: white">{{email}}</h2>
+    <img src={{photoURL}} onerror="this.style.display='none'">
     <p style="color: white">You signed in using Firebase</p>
     <a href="/logout" class="btn btn-primary">Logout</a>
 </div>
