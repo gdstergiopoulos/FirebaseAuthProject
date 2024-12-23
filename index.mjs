@@ -5,6 +5,7 @@ import { initializeApp } from "firebase/app";
 import cors from 'cors';
 
 import { getAuth,  createUserWithEmailAndPassword , signInWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, signInWithRedirect,signInWithPopup, signInAnonymously, linkWithCredential, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink} from "firebase/auth";
+
 // import {} from "firebase/auth";
 
 const firebaseConfig = {
@@ -67,7 +68,10 @@ router.route('/').get((req, res) => {
     //     }
     // });
     if(req.session.email){ 
-        res.render('main', { layout: 'main', email: req.session.email, uid:req.session.uid, displayName:req.session.displayName, photoURL:req.session.photoURL });
+        res.render('main', { layout: 'main', email: req.session.email, uid:req.session.uid, displayName:req.session.displayName, photoURL:req.session.photoURL, method:"Google Sign-in" });
+    }
+    else if(req.session.phone){ 
+        res.render('main', { layout: 'main', phone: req.session.phone, method:"Phone Login" });
     }
     else{
         if(auth.currentUser){
@@ -232,6 +236,15 @@ router.route('/login/passwordless/success').post((req, res) => {
     console.log(req.body);
 });
 
+router.route('/login/phone').get((req, res) => {   
+    res.render('phone', { layout: 'main' });
+});
+
+router.route('/login/phone').post((req, res) => {
+    console.log(req.body);
+    req.session.phone=req.body.phoneNumber;
+    res.json({ message: 'phone login successful' });
+});
 router.use((req, res) => {
     res.status(404).send('404 Not Found');
 });

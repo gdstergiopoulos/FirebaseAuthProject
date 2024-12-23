@@ -1,0 +1,164 @@
+{{!-- <h1 id="logintitle">Login Page</h1>
+<form method="post"> 
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username">
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password">
+    <button type="submit">Login</button>
+</form> --}}
+
+<div class="loginpage">
+            <form> 
+                {{#if message}}
+                <div class="alert alert-success" role="alert">
+                    {{message}}
+                </div>
+                {{/if}}
+                <h1>Firebase Auth Demo</h1>
+                <br>
+                <label for="phone-number" class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" id="phone-number" name="phone" placeholder="69xxxxxxx">
+                <script>
+                    const phoneInputField = document.querySelector("#phone-number");
+                    const phoneInput = window.intlTelInput(phoneInputField, {
+                        initialCountry: "gr",
+                        utilsScript:
+                        "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                    });
+
+                </script>
+                {{!-- <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Password" required> --}}
+                <br>
+                {{#if error}}
+                <div class="alert alert-danger" role="alert">
+                    {{error}}
+                </div>
+                {{/if}}
+                <div id="recaptcha-container"></div>
+                <div id="otp-section" style="display: none;">
+                    <label for="otp">Enter OTP:</label>
+                    <br>
+                    <input class="form-control" type="text" id="otp" placeholder="123456" />
+                    <button class="btn btn-primary" id="verify-otp">Verify OTP</button>
+                </div>
+                <p id="status" style="color: red"></p>
+                <button type="button" id="send-otp" class="btn btn-primary">Send OTP</button>
+                <br>
+                {{!-- <a id="linktoreg" href="/register">Create an account</a>     --}}
+            </form>
+            <div class="divider">OR</div>
+            <div id="sign-in-options">
+                <a id="googleSignIn" class="google-btn">
+                    <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google Logo">
+                        <span>Sign-in with Google</span>
+                </a>
+                <a href="/login/anon" class="google-btn">
+                    <img src="https://img.icons8.com/metro/26/decision.png" alt="Google Logo">
+                        <span>Anonymous</span>
+                </a>
+                <br><br>
+                <a href="/login" class="google-btn">
+                <img src="https://img.icons8.com/ios/50/password--v1.png" alt="Google Logo">
+                        <span>Password</span>
+                </a>
+                <a href="/login/passwordless" class="google-btn">
+                    <img src="https://img.icons8.com/ios/50/mail.png" alt="Google Logo">
+                        <span>Passwordless</span>
+                </a>
+            </div>
+            
+        {{!-- <button id="googleSignIn">Sign in with Google</button> --}}
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDujX1xksZ12l4HTNIesiez-hdEPmRaO4g",
+            authDomain: "cybersecurityhmty.firebaseapp.com",
+            projectId: "cybersecurityhmty",
+            storageBucket: "cybersecurityhmty.firebaseapp.com",
+            messagingSenderId: "617838396186",
+            appId: "1:617838396186:web:bf8a87b857ca9d3748e2a3",
+            measurementId: "G-8B270P5BTQ"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const provider = new firebase.auth.GoogleAuthProvider();
+
+
+    // Set up Recaptcha
+    const setupRecaptcha = () => {
+      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        size: 'invisible',
+        callback: (response) => {
+          console.log("Recaptcha solved:", response);
+        }
+      });
+    };
+
+    document.getElementById("send-otp").addEventListener("click", () => {
+       document.getElementById("status").innerText = "";
+       const phoneInputField = document.querySelector("#phone-number");
+                    const phoneInput = window.intlTelInput(phoneInputField, {
+                        initialCountry: "gr",
+                        utilsScript:
+                        "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                    });
+      console.log(phoneInput.getNumber());
+      let phoneNumber = phoneInput.getNumber();
+      const appVerifier = window.recaptchaVerifier;
+
+      // Send OTP
+      firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+        .then((confirmationResult) => {
+          window.confirmationResult = confirmationResult;
+          //document.getElementById("status").innerText = "OTP sent!";
+          document.getElementById("otp-section").style.display = "block";
+          document.getElementById("send-otp").style.display = "none";
+        }).catch((error) => {
+            document.getElementById("status").style.color = "red";
+          document.getElementById("status").innerText = error.message;
+          console.error("Error during OTP sending:", error);
+        });
+    });
+
+    document.getElementById("verify-otp").addEventListener("click", (event) => {
+      event.preventDefault();
+      const otp = document.getElementById("otp").value;
+
+      // Verify OTP
+      window.confirmationResult.confirm(otp).then((result) => {
+        const user = result.user;
+        document.getElementById("status").style.color = "green";
+        document.getElementById("status").innerText = `Login successful! Welcome, ${user.phoneNumber}`;
+        fetch('http://localhost:3000/login/phone', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ phoneNumber: user.phoneNumber })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        })
+        .then(() => {
+            window.location.href = '/';
+        });
+
+      }).catch((error) => {
+        document.getElementById("status").innerText = "Invalid OTP!";
+        console.error("Error during OTP verification:", error);
+      });
+    });
+
+    // Initialize Recaptcha
+    setupRecaptcha();
+        
+    </script>
+
+</div>

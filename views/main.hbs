@@ -1,13 +1,19 @@
 
 <div class="container" id="homecont">
     <h1>Welcome{{#if displayName}}<span>, {{displayName}}</span>{{/if}}</h1>
+    {{#if email}}
     <h2>{{email}}</h2>
+    {{/if}}
+    {{#if phone}}
+    <h2>{{phone}}</h2>
+    {{/if}}
     {{#if photoURL}}
         <img src={{photoURL}} onerror="this.style.display='none'">
     {{/if}}
     {{!-- <img src={{photoURL}} onerror="this.style.display='none'"> --}}
     {{!-- <p>You signed in using Firebase</p> --}}
-    <p> Sign-in method: <span>{{#if method}}{{method}}{{/if}}{{#if displayName}}Google Sign-in{{/if}}</span></p>
+    {{!-- <p> Sign-in method: <span>{{#if method}}{{method}}{{/if}}{{#if displayName}}Google Sign-in{{/if}}</span></p> --}}
+    <p> Sign-in method: <span>{{#if method}}{{method}}{{/if}}</span></p>
     <a href="/logout" id="logoutbtn" class="btn btn-primary">Logout</a>
 </div>
 <hr style="color: #91c2db">

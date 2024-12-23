@@ -243,3 +243,15 @@ color: #ffa101;
     align-self: center;
     margin: auto;
 }
+
+#otp-section>label{
+    color: #ffa101;
+}
+
+#verify-otp{
+    background-color: #ffa101;
+    border-color: #ffa101;
+    color:#000000;
+    margin-top: 2%
+}
+
