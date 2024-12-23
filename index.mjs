@@ -4,7 +4,7 @@ import session from 'express-session';
 import { initializeApp } from "firebase/app";
 import cors from 'cors';
 
-import { getAuth,  createUserWithEmailAndPassword , signInWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, signInWithRedirect,signInWithPopup, signInAnonymously, linkWithCredential} from "firebase/auth";
+import { getAuth,  createUserWithEmailAndPassword , signInWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, signInWithRedirect,signInWithPopup, signInAnonymously, linkWithCredential, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink} from "firebase/auth";
 // import {} from "firebase/auth";
 
 const firebaseConfig = {
@@ -203,43 +203,34 @@ router.route('/login/google').post(async (req, res) => {
     }   
 });
 
-// router.route('/login/google').get(async (req, res) => {
-//     try {
-//         await signInWithPopup(auth, googleProvider)
-//         .then((result) => {
-//             const credential = GoogleAuthProvider.credentialFromResult(result);
-//             const token = credential.accessToken; // Optional
-//             const user = result.user;
-//             res.render('main', { layout: 'main', email: user.email });
-//         })
-//         .catch((error) => {
-//             const errorMessage = error.message;
-//             res.render('login', { layout: 'main', error: errorMessage });
-//         });
-//     } catch (error) {
-//         const errorMessage = error.message;
-//         res.render('login', { layout: 'main', error: errorMessage });
-//     }
-// });
+router.route('/login/passwordless').get((req, res) => {
+    res.render('passwordless', { layout: 'main' });
+} );
 
-// // Handle the result of the redirect
-// router.route('/google-redirect').get(async (req, res) => {
-//     try {
-//         const result = await getRedirectResult(auth);
-//         if (result) {
-//             const credential = GoogleAuthProvider.credentialFromResult(result);
-//             const token = credential.accessToken; // Optional: Use this token
-//             const user = result.user;
+router.route('/login/passwordless').post((req, res) => {
+    req.session.emailprovided=req.body.email;
+    sendSignInLinkToEmail(auth, req.body.email, {
+        url: 'http://localhost:3000/login/passwordless/verify',
+        handleCodeInApp: true,
+    })
+    .then(() => {
+        res.render('passwordless', { layout: 'main', message: 'Email sent. Please check your inbox.' });
+    })
+    .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        res.render('passwordless', { layout: 'main', error: errorMessage });
+    });
+});
 
-//             res.render('main', { layout: 'main', email: user.email });
-//         } else {
-//             res.redirect('/login'); // No redirect result, go to login
-//         }
-//     } catch (error) {
-//         const errorMessage = error.message;
-//         res.render('login', { layout: 'main', error: errorMessage });
-//     }
-// });
+router.route('/login/passwordless/verify').get((req, res) => {
+    const { oobCode } = req.query;
+    res.render('passwordlessverify', { layout: 'main',message:"Verifying...",emailprovided:req.session.emailprovided,oobCode });
+});
+
+router.route('/login/passwordless/success').post((req, res) => {
+    console.log(req.body);
+});
 
 router.use((req, res) => {
     res.status(404).send('404 Not Found');
