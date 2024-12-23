@@ -628,3 +628,39 @@ footer .social-icons a:hover {
 .google-btn:hover {
    opacity: 0.6;
 }
+
+
+#sign-in-options{
+    display: flex;
+    flex-direction: row;
+}
+
+@media screen and (max-width: 700px) {
+    #sign-in-options{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+#sign-in-options>a{
+    margin-right: 1%;
+}
+
+.divider {
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    color: white;
+    width: 30%;
+    margin-bottom: 1%;
+  }
+  
+  .divider::before, .divider::after {
+    flex: 1;
+    content: '';
+    padding: 1px;
+    background-color: white;
+    margin: 7px;
+  }
