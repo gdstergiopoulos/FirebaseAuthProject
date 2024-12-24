@@ -214,7 +214,7 @@ router.route('/login/passwordless').get((req, res) => {
 router.route('/login/passwordless').post((req, res) => {
     req.session.emailprovided=req.body.email;
     sendSignInLinkToEmail(auth, req.body.email, {
-        url: 'http://localhost:3000/login/passwordless/verify',
+        url: `http://localhost:3000/login/passwordless/verify?email=${encodeURIComponent(req.body.email)}`,
         handleCodeInApp: true,
     })
     .then(() => {
