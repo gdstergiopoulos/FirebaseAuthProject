@@ -67,11 +67,15 @@ router.route('/').get((req, res) => {
     //         res.redirect('/login');
     //     }
     // });
+    console.log("HERE:",req.session.emailprovided)
     if(req.session.email){ 
         res.render('main', { layout: 'main', email: req.session.email, uid:req.session.uid, displayName:req.session.displayName, photoURL:req.session.photoURL, method:"Google Sign-in" });
     }
     else if(req.session.phone){ 
         res.render('main', { layout: 'main', phone: req.session.phone, method:"Phone Login" });
+    }
+    else if(req.session.emailprovided){
+        res.render('main', { layout: 'main', email: req.session.emailprovided, method:"Passwordless Login" });
     }
     else{
         if(auth.currentUser){
@@ -106,7 +110,7 @@ router.route('/login').get((req, res) => {
     //     }
     // });
 
-    if(auth.currentUser){
+    if(auth.currentUser || req.session.email || req.session.phone || req.session.emailprovided){
         res.redirect('/');
     }
     else{
@@ -229,7 +233,17 @@ router.route('/login/passwordless').post((req, res) => {
 
 router.route('/login/passwordless/verify').get((req, res) => {
     const { oobCode } = req.query;
-    res.render('passwordlessverify', { layout: 'main',message:"Verifying...",emailprovided:req.session.emailprovided,oobCode });
+    req.session.emailprovided=req.query.email;
+    console.log(req.query.email);
+    console.log(oobCode);
+    if(oobCode){
+        console.log("entered")
+        res.render('main', { layout: 'main', email: req.session.emailprovided, method: "Passwordless Login" });
+    }
+    else{
+        res.render('passwordlessverify', { layout: 'main',message:"Verifying...",emailprovided:req.session.emailprovided });
+    }
+    // res.render('passwordlessverify', { layout: 'main',message:"Verifying...",emailprovided:req.session.emailprovided,oobCode });
 });
 
 router.route('/login/passwordless/success').post((req, res) => {
