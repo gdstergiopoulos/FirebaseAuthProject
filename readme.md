@@ -16,15 +16,5 @@ Developed by:<br>
   <i>npm install<br>npm start</i>
   <li>Δοκιμάστε την εφαρμογή μας στο http://localhost:3000/</li>
 </ol>
-<img src="media/2.png" style="width:50%;height:50%">
-<img src="media/3.png" style="width:50%;height:50%">
-<img src="media/4.png" style="width:50%;height:50%">
-<img src="media/5.png" style="width:50%;height:50%">
-<img src="media/6.png" style="width:50%;height:50%">
-<img src="media/7.png" style="width:50%;height:50%">
-<img src="media/8.png" style="width:50%;height:50%">
-<img src="media/9.png" style="width:50%;height:50%">
-<img src="media/10.png" style="width:50%;height:50%">
-<img src="media/11.png" style="width:50%;height:50%">
 
 
